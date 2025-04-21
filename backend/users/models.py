@@ -31,7 +31,7 @@ class User(AbstractUser):
     
     def is_verification_code_valid(self, code):
         """
-        Проверяет, действителен ли код верификации
+        Валидирует, действителен ли код верификации
         """
         # Проверка на совпадение кода
         if self.otp != code:
