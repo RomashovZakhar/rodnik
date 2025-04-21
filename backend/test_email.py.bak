@@ -15,8 +15,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 def test_email_sending():
-    subject = 'Тестовое письмо от приложения'
-    message = 'Это тестовое письмо для проверки настроек отправки email через Яндекс.Почту.'
+    subject = 'Это тестовое письмо от приложения'
+    message = 'Тестовое письмо для проверки настроек отправки email через Яндекс.Почту.'
     from_email = settings.DEFAULT_FROM_EMAIL
     recipient_list = ['zakharomashov@gmail.com']  # Замените на email для теста (не тот же, что и отправитель)
     
@@ -33,11 +33,11 @@ def test_email_sending():
         )
         
         if result:
-            print("✅ Письмо успешно отправлено!")
+            print("Письмо успешно отправлено!✅")
         else:
-            print("❌ Ошибка при отправке письма.")
+            print("Ошибка при отправке письма.❌")
     except Exception as e:
-        print(f"❌ Исключение при отправке письма: {str(e)}")
+        print(f"Исключение при отправке письма: {str(e)}❌")
 
 if __name__ == "__main__":
     test_email_sending() 
