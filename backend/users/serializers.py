@@ -29,6 +29,38 @@ class EmailVerifiedTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Выполняем стандартную валидацию токена
         return super().validate(attrs)
 
+class RegisterSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для регистрации пользователей
+    """
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password_confirm = serializers.CharField(write_only=True, required=True)
+    
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'password_confirm', 'first_name', 'last_name']
+    
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password_confirm']:
+            raise serializers.ValidationError({"password": "Пароли не совпадают"})
+        return attrs
+    
+    def create(self, validated_data):
+        # Удаляем password_confirm, так как мы его не сохраняем
+        validated_data.pop('password_confirm')
+        
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', '')
+        )
+        
+        user.set_password(validated_data['password'])
+        user.save()
+        
+        return user
+
 class UserSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели пользователя
@@ -72,38 +104,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ['id', 'sender', 'sender_username', 'type', 'content', 'is_read', 'created_at']
         read_only_fields = ['sender', 'type', 'content', 'created_at']
-
-class RegisterSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для регистрации пользователей
-    """
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password_confirm = serializers.CharField(write_only=True, required=True)
-    
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password', 'password_confirm', 'first_name', 'last_name']
-    
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password_confirm']:
-            raise serializers.ValidationError({"password": "Пароли не совпадают"})
-        return attrs
-    
-    def create(self, validated_data):
-        # Удаляем password_confirm, так как мы его не сохраняем
-        validated_data.pop('password_confirm')
         
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            first_name=validated_data.get('first_name', ''),
-            last_name=validated_data.get('last_name', '')
-        )
-        
-        user.set_password(validated_data['password'])
-        user.save()
-        
-        return user
 
 class VerifyEmailSerializer(serializers.Serializer):
     """
