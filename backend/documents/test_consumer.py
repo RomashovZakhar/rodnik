@@ -1,49 +1,77 @@
 import json
 import logging
 from channels.generic.websocket import WebsocketConsumer
-import time
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
 class SimpleTestConsumer(WebsocketConsumer):
     """
-    Предельно простой WebSocket-потребитель для тестирования
+    WebSocket-потребитель для тестирования взаимодействия с документами
+    Поддерживает:
+    - Логирование соединений
+    - Эхо-ответы на сообщения
+    - Обработку ошибок
     """
     
     def connect(self):
+        """Обработка установки соединения"""
         try:
-            # Извлекаем ID документа из URL
-            self.document_id = self.scope['url_route']['kwargs']['document_id']
-            
-            # Логируем попытку подключения
-            logger.info(f"[TEST] Попытка подключения к документу {self.document_id}")
-            
-            # Принимаем соединение - критический шаг
+            self._extract_document_id()
+            self._log_connection_attempt()
             self.accept()
-            
-            logger.info(f"[TEST] Соединение установлено")
-            
-            # Отправляем подтверждение подключения клиенту
-            self.send(text_data=json.dumps({
-                'type': 'connection_established',
-                'message': 'Тестовое соединение установлено',
-                'document_id': self.document_id
-            }))
+            self._send_connection_confirmation()
         except Exception as e:
-            logger.error(f"[TEST] Ошибка при подключении: {str(e)}")
-    
+            self._handle_error("Ошибка подключения", e)
+            self.close()
+
     def disconnect(self, close_code):
-        logger.info(f"[TEST] Отключение с кодом {close_code}")
-    
+        """Обработка разрыва соединения"""
+        logger.info(f"[TEST] Соединение закрыто (код {close_code})", 
+                   extra={'document_id': getattr(self, 'document_id', 'N/A')})
+
     def receive(self, text_data):
+        """Обработка входящих сообщений"""
         try:
-            logger.info(f"[TEST] Получено сообщение: {text_data}")
-            
-            # Просто отправляем эхо обратно
-            self.send(text_data=json.dumps({
-                'type': 'echo',
-                'received': text_data,
-                'timestamp': str(time.time())
-            }))
+            self._log_incoming_message(text_data)
+            response = self._create_echo_response(text_data)
+            self.send_message(response)
         except Exception as e:
-            logger.error(f"[TEST] Ошибка обработки сообщения: {str(e)}") 
+            self._handle_error("Ошибка обработки сообщения", e)
+
+    # Вспомогательные методы
+    def _extract_document_id(self):
+        """Извлекает ID документа из URL"""
+        self.document_id = self.scope['url_route']['kwargs'].get('document_id')
+        
+    def _log_connection_attempt(self):
+        """Логирует попытку подключения"""
+        logger.info("[TEST] Попытка подключения", 
+                   extra={'document_id': self.document_id})
+        
+    def _send_connection_confirmation(self):
+        """Отправляет подтверждение соединения"""
+        self.send_message({
+            'type': 'connection_established',
+            'message': 'Тестовое соединение установлено',
+            'document_id': self.document_id
+        })
+        
+    def _create_echo_response(self, text_data):
+        """Формирует эхо-ответ"""
+        return {
+            'type': 'echo_response',
+            'received': text_data,
+            'timestamp': timezone.now().isoformat()
+        }
+
+    def send_message(self, data):
+        """Обертка для отправки сообщений с логированием"""
+        self.send(text_data=json.dumps(data))
+        logger.debug("[TEST] Отправлено сообщение: %s", data)
+
+    def _handle_error(self, message, error):
+        """Унифицированная обработка ошибок"""
+        logger.error(f"[TEST] {message}: {str(error)}",
+                    exc_info=True,
+                    extra={'document_id': getattr(self, 'document_id', 'N/A')})
