@@ -4,6 +4,7 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 import { nanoid } from 'nanoid';
 
+
 // Обработчик POST запроса для загрузки изображений
 export async function POST(request: NextRequest) {
   try {
