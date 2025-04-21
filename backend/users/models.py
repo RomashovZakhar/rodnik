@@ -56,7 +56,7 @@ class Notification(models.Model):
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_notifications')
     type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES)
-    content = models.JSONField(default=dict)  # Для хранения доп. информации (ID документа, название и т.д.)
+    content = models.JSONField(default=dict)  # Для хранения доп. информации (ID документа, название и прочее)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     
