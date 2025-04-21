@@ -7,6 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def send_verification_email(user, verification_code):
     """
     Отправляет письмо с кодом верификации на email пользователя
