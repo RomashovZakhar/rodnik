@@ -6,11 +6,6 @@ from users.views import UserViewSet, RegisterView, VerifyEmailView, ResendVerifi
 from documents.views import DocumentViewSet
 from tasks.views import TaskViewSet
 
-# Создаем маршрутизатор
-router = DefaultRouter()
-router.register(r'documents', DocumentViewSet, basename='document')
-router.register(r'users', UserViewSet, basename='user')
-
 urlpatterns = [
     # Маршруты для аутентификации
     path('token/', EmailVerifiedTokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -25,3 +20,9 @@ urlpatterns = [
     # path('', include('documents.urls')),
     # path('', include('users.urls')),
 ] 
+
+# Создаем маршрутизатор
+router = DefaultRouter()
+router.register(r'documents', DocumentViewSet, basename='document')
+router.register(r'users', UserViewSet, basename='user')
+
