@@ -29,6 +29,16 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'zakharomashov@yandex.ru'
+EMAIL_HOST_PASSWORD = 'wxyzyemssjaijtfq'
+DEFAULT_FROM_EMAIL = 'zakharomashov@yandex.ru'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -145,15 +155,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'zakharomashov@yandex.ru'
-EMAIL_HOST_PASSWORD = 'wxyzyemssjaijtfq'
-DEFAULT_FROM_EMAIL = 'zakharomashov@yandex.ru'
 
 # URL фронтенда для формирования ссылок в письмах
 FRONTEND_URL = 'http://localhost:3000'  # Измените на актуальный URL в продакшене
