@@ -4,28 +4,6 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 User = settings.AUTH_USER_MODEL
 
-class Document(MPTTModel):
-    """
-    Модель документа с древовидной структурой.
-    Используем MPTT для эффективной работы с деревом.
-    """
-    title = models.CharField(max_length=255)
-    content = models.JSONField(default=dict)  # Для хранения содержимого EditorJS
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
-    is_favorite = models.BooleanField(default=False)
-    is_root = models.BooleanField(default=False)  # Флаг для обозначения корневого документа (рабочего пространства)
-    
-    # MPTT поля для древовидной структуры
-    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-    
-    class MPTTMeta:
-        order_insertion_by = ['title']
-    
-    def __str__(self):
-        return self.title
-
 class AccessRight(models.Model):
     """
     Модель для хранения прав доступа к документам
@@ -48,6 +26,29 @@ class AccessRight(models.Model):
     
     def __str__(self):
         return f"{self.user.email} - {self.get_role_display()} для {self.document.title}"
+
+class Document(MPTTModel):
+    """
+    Модель документа с древовидной структурой.
+    Используем MPTT для эффективной работы с деревом.
+    """
+    title = models.CharField(max_length=255)
+    content = models.JSONField(default=dict)  # Для хранения содержимого EditorJS
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
+    is_favorite = models.BooleanField(default=False)
+    is_root = models.BooleanField(default=False)  # Флаг для обозначения корневого документа (рабочего пространства)
+    
+    # MPTT поля для древовидной структуры
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    
+    class MPTTMeta:
+        order_insertion_by = ['title']
+    
+    def __str__(self):
+        return self.title
+        
 
 class DocumentHistory(models.Model):
     """
