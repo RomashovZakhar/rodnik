@@ -27,6 +27,7 @@ class DocumentHistory(models.Model):
         (ACTION_NESTED_CREATE, 'Создание вложенного документа'),
         (ACTION_TASK_COMPLETE, 'Завершение задачи'),
     ]
+
     
     document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='history')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='document_edits')
