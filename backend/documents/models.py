@@ -28,7 +28,6 @@ class DocumentHistory(models.Model):
         (ACTION_TASK_COMPLETE, 'Завершение задачи'),
     ]
 
-    
     document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='history')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='document_edits')
     changes = models.JSONField()  # Хранит данные о изменениях
